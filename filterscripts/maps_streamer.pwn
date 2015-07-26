@@ -1,4 +1,5 @@
 #include <a_samp>
+#include <streamer>
 #include <sscanf2>
 
 new DB: DbHandle;
@@ -59,8 +60,8 @@ LoadMaps()
             db_get_field_assoc(db_result, "PosrZ", result, sizeof(result)); rot[2] = floatstr(result);
             db_get_field_assoc(db_result, "ObjectGroup", result, sizeof(result)); object = strval(result);
 
-            MapData[idx][mObjectID] = CreateObject(objectid, pos[0], pos[1], pos[2], rot[0], rot[1], rot[2]);
-            if(IsValidObject(MapData[idx][mObjectID]))
+            MapData[idx][mObjectID] = CreateDynamicObject(objectid, pos[0], pos[1], pos[2], rot[0], rot[1], rot[2]);
+            if(IsValidDynamicObject(MapData[idx][mObjectID]))
             {
                 MapData[idx][mObjectActive] = true;
                 MapData[idx][mPosX] = pos[0];
@@ -87,8 +88,8 @@ UnloadMaps()
 	new count;
 	for(new i; i < MAX_MAP_OBJECTS; i++)
 	{
-	    if(IsValidObject(MapData[i][mObjectID])) {
-	        DestroyObject(MapData[i][mObjectID]);
+	    if(IsValidDynamicObject(MapData[i][mObjectID])) {
+	        DestroyDynamicObject(MapData[i][mObjectID]);
 	        MapData[i][mObjectActive] = false;
 	        count++;
 		}
@@ -105,18 +106,18 @@ LoadGroupMaps(groupid)
 	for(new i; i < MAX_MAP_OBJECTS; i++)
 	{
 	    if(MapData[i][mGroup] == groupid) {
-	        MapData[i][mObjectID] = CreateObject(MapData[i][mObjectModel], MapData[i][mPosX], MapData[i][mPosY], MapData[i][mPosZ], MapData[i][mrPosX], MapData[i][mrPosY], MapData[i][mrPosZ]);
-            if(IsValidObject(MapData[i][mObjectID]))
+	        MapData[i][mObjectID] = CreateDynamicObject(MapData[i][mObjectModel], MapData[i][mPosX], MapData[i][mPosY], MapData[i][mPosZ], MapData[i][mrPosX], MapData[i][mrPosY], MapData[i][mrPosZ]);
+            if(IsValidDynamicObject(MapData[i][mObjectID]))
             {
                 MapData[i][mObjectActive] = true;
 			}
 		}
-
+		
 		else {
 			continue;
 		}
 	}
-
+	
 	return 1;
 }
 
@@ -124,8 +125,8 @@ UnloadGroupMaps(groupid)
 {
 	for(new i; i < MAX_MAP_OBJECTS; i++)
 	{
-	    if(IsValidObject(MapData[i][mObjectID]) && MapData[i][mGroup] == groupid) {
-	        DestroyObject(MapData[i][mObjectID]);
+	    if(IsValidDynamicObject(MapData[i][mObjectID]) && MapData[i][mGroup] == groupid) {
+	        DestroyDynamicObject(MapData[i][mObjectID]);
 	        MapData[i][mObjectActive] = false;
 		}
 	}
@@ -144,12 +145,12 @@ public OnRconCommand(cmd[])
 		else if(strcmp(operation, "unloadall", true) == 0) {
 		    UnloadMaps();
 		}
-
+		
 		else if(strcmp(operation, "loadgroup", true) == 0) {
 			UnloadGroupMaps(integer);
 		    LoadGroupMaps(integer);
 		}
-
+		
 		else if(strcmp(operation, "unloadgroup", true) == 0) {
 		    UnloadGroupMaps(integer);
 		}
